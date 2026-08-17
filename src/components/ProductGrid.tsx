@@ -4,23 +4,13 @@ import { motion, type Variants } from "framer-motion";
 import ProductCard from "@/components/ProductCard";
 import type { Product } from "@/lib/products";
 
-const container: Variants = {
-  hidden: {},
-  show: {
-    transition: {
-      staggerChildren: 0.07,
-    },
-  },
-};
-
 const item: Variants = {
   hidden: { opacity: 0, y: 18 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.35, ease: "easeOut" },
-  },
+  show: { opacity: 1, y: 0 },
 };
+
+const MAX_STAGGER_DELAY = 0.3;
+const STAGGER_STEP = 0.06;
 
 export default function ProductGrid({
   products,
@@ -30,18 +20,23 @@ export default function ProductGrid({
   className?: string;
 }) {
   return (
-    <motion.div
-      className={className}
-      variants={container}
-      initial="hidden"
-      whileInView="show"
-      viewport={{ once: true, amount: 0.2, margin: "0px 0px -80px 0px" }}
-    >
-      {products.map((product) => (
-        <motion.div key={product.id} variants={item}>
+    <div className={className}>
+      {products.map((product, index) => (
+        <motion.div
+          key={product.id}
+          variants={item}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0, margin: "0px 0px -10% 0px" }}
+          transition={{
+            duration: 0.35,
+            ease: "easeOut",
+            delay: Math.min(index * STAGGER_STEP, MAX_STAGGER_DELAY),
+          }}
+        >
           <ProductCard product={product} />
         </motion.div>
       ))}
-    </motion.div>
+    </div>
   );
 }
